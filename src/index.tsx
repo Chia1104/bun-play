@@ -2,11 +2,12 @@ import { Elysia, t } from "elysia";
 import { html } from "@elysiajs/html";
 import * as elements from "typed-html";
 import { BaseHtml } from "./components/todo";
-import { authPlugin } from "./modules/auth";
+import { authPlugin, authGroups } from "./modules/auth";
 import { swagger } from "@elysiajs/swagger";
 
 const app = new Elysia()
   .use(authPlugin())
+  .use(authGroups())
   .use(html())
   .use(
     swagger({
@@ -21,9 +22,7 @@ const app = new Elysia()
   )
   .get(
     "/",
-    async ({ html, auth, request }) => {
-      const response = await auth(request);
-      console.log(response.status);
+    async ({ html }) => {
       return html(
         <BaseHtml>
           <body
@@ -34,7 +33,6 @@ const app = new Elysia()
           >
             <h1>Todo List</h1>
             <br />
-            <p>{response.status}</p>
           </body>
         </BaseHtml>
       );
@@ -45,21 +43,6 @@ const app = new Elysia()
         tags: ["base"],
       },
     }
-  )
-  .group(
-    "auth",
-    {
-      request: t.Any,
-      headers: t.Object({
-        authorization: t.Literal("Bearer token"),
-      }),
-      whatIsThis: t.Any,
-      // body: t.String(),
-    },
-    (app) =>
-      app.get("/test", ({ body, headers, html }) => html(<p>{body}</p>), {
-        beforeHandle: ({ request }) => console.log("before handle"),
-      })
   )
   .get("/styles.css", () => Bun.file("./tailwind-gen/styles.css"))
   .listen(Bun.env.PORT ?? 3000);
