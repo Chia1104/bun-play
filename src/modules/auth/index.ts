@@ -7,12 +7,8 @@ import { serialize, parse, type CookieSerializeOptions } from "cookie";
 export const authPlugin = (authConfig?: AuthConfig) => {
   return (
     new Elysia({
-        /**
-         * @todo
-         * how...
-         */
-      // name: "auth"
-      // seed: authConfig
+      name: "auth",
+      seed: authConfig
     })
       .decorate("auth", authHandler)
       .state("auth", {})
